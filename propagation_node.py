@@ -1,6 +1,6 @@
 from builtins import range
 import numpy as np
-
+import re
 
 class Node(object):
     """
@@ -41,7 +41,7 @@ class Node(object):
         """
         # self.outgoing = [x / np.sum(x) for x in self.outgoing]
         n, q = self.outgoing.shape
-        normalizer = np.sum(self.outgoing, axis=1).reshape((-1, 1))
+        normalizer = np.sum(self.outgoing, axis=1)
         for r in range(q):
             self.outgoing[:, r] = self.outgoing[:, r] / normalizer
 
@@ -58,7 +58,10 @@ class Node(object):
         Sends all outgoing messages.
         """
         n, q = self.outgoing.shape
+        print(self.outgoing)
+        print(len(self.nbrs))
         for i in range(n):
+            print(i)
             self.nbrs[i].receive_message(self, self.outgoing[i])
 
     def check_convergence(self):
@@ -84,10 +87,13 @@ class PropagationNode(Node):
     Node in graph under propagation.
     """
 
-    def __init__(self, name, dim, nid):
+    def __init__(self, name, n, dim, nid):
         super(PropagationNode, self).__init__(nid)
         self.name = name
         self.dim = dim
+        self.incoming = np.random.uniform(0, 1, (n, self.dim))
+        self.outgoing = np.random.uniform(0, 1, (n, self.dim))
+        self.oldoutgoing = np.random.uniform(0, 1, (n, self.dim))
         self.observed = -1  # only >= 0 if variable is observed
 
     def reset(self):
@@ -97,6 +103,15 @@ class PropagationNode(Node):
         self.outgoing = np.ones((n, self.dim))
         self.oldoutgoing = np.ones((n, self.dim))
         self.observed = -1
+
+    def add_nbrs(self, graph):
+        pattern = re.compile(r"[0-9]+")
+        index = int(re.findall(pattern, self.name)[0]) - 1
+        n, _ = graph.adjacency.shape
+        nbr_arr = graph.adjacency[index]
+        for i in range(n):
+            if i != index and nbr_arr[i] != 0:
+                self.nbrs.append(graph.var["Node #{}".format(i + 1)])
 
     def condition(self, observation):
         """
@@ -117,7 +132,7 @@ class PropagationNode(Node):
         """
 
         # compute new messages if no observation has been made
-        if self.enabled and self.observed < 0 and len(self.nbrs) > 1:
+        if self.enabled and self.observed < 0 and len(self.nbrs) > 0:
             # switch reference for old messages
             self.next_step()
             n, q = self.incoming.shape
@@ -127,9 +142,9 @@ class PropagationNode(Node):
                 # multiply together all excluding message at current index
                 holder = aux[i, :]
                 aux[i, :] = np.ones(q)
-                arr = adjacency[i, :].reshape((-1, 1))
-                filtering = np.hstack((arr, arr))
-                self.outgoing[i, :] = np.prod(aux * filtering, axis=0)
+                # arr = adjacency[i, :].reshape((-1, 1))
+                # filtering = np.hstack((arr, arr))
+                self.outgoing[i, :] = np.prod(aux, axis=0)
                 aux[i, :] = holder
 
             # normalize once finished with all messages
