@@ -22,11 +22,6 @@ def get_init_phi(n, q):
     """
 
     phi = np.random.uniform(0, 1, (n, n, q))
-
-    # phi = np.ones((n, n, q)) / q
-    # phi[1,1,0] = 1
-    # phi[1,1,1] = 0
-
     phi_empty = np.zeros((n, n, q))
 
     phi = normalize(phi)
@@ -42,11 +37,7 @@ def normalize(phi):
     n, _, q = phi.shape
     phi_norm = np.sum(phi, axis=2)
     for r in range(q):
-        # for i in range(n):
-        #     for j in range(n):
-        #         if phi_norm[i, j] != 0:
-        #             phi[i, j, r] = phi[i, j, r] / phi_norm[i, j]
-        phi[:, :, r] = phi[:, :, r] / phi_norm
+        phi[:, :, r] = divide_safezero(phi[:, :, r], phi_norm)
     return phi
 
 
@@ -126,24 +117,32 @@ def marginal_prob(A, phi, p):
 
     marginal_norm = np.sum(marginal, axis=1)
     for r in range(q):
-        marginal[:, r] = marginal[:, r] / marginal_norm
+        # marginal[:, r] = marginal[:, r] / marginal_norm
+        marginal[:, r] = divide_safezero(marginal[:, r], marginal_norm)
 
     return marginal
 
 
-# class Vertex(object):
-#     """
-#     Vertex is an object representing a node in some graph that operates under
-#     belief propagation.
-#     """
-#
-#     def __init__(self, arg):
-#         super(Vertex, self).__init__()
-#         self.arg = arg
+def divide_safezero(a, b):
+    '''
+    Divies a by b, then turns nans and infs into 0, so all division by 0
+    becomes 0.
+    Args:
+        a (np.ndarray)
+        b (np.ndarray|int|float)
+    Returns:
+        np.ndarray
+    '''
+    # deal with divide-by-zero: turn x/0 (inf) into 0, and turn 0/0 (nan) into
+    # 0.
+    c = a / b
+    c[c == np.inf] = 0.0
+    c = np.nan_to_num(c)
+    return c
 
 
 if __name__ == "__main__":
-    n = 50
+    n = 10
     q = 2
     a = .9
     b = .1
@@ -156,6 +155,6 @@ if __name__ == "__main__":
     phi = belief_propagation(A, phi_init, phi_empty, p, 100)
     marginal = marginal_prob(A, phi, p)
 
-    # print("The propagation result is: \n{}".format(phi[:, :, 0]))
+    print("The propagation result is: \n{}".format(phi[:, :, 0]))
     print("The marginal from BP is: \n{}".format(marginal))
     print("The ground truth is: \n{}".format(ground_truth))
