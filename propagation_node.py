@@ -31,14 +31,16 @@ class Node(object):
 
     def next_step(self):
         """
-        Copy outgoing massages into oldoutgoing.
+        Copys outgoing massages into oldoutgoing.
         """
+
         self.oldoutgoing = self.outgoing[:, :]
 
     def normalize_messages(self):
         """
-        Normalize to sum to 1.
+        Normalizes to sum to 1.
         """
+
         # self.outgoing = [x / np.sum(x) for x in self.outgoing]
         n, q = self.outgoing.shape
         normalizer = np.sum(self.outgoing, axis=1)
@@ -49,6 +51,7 @@ class Node(object):
         """
         Places new message into correct location in new message list.
         """
+
         if self.enabled:
             i = self.nbrs.index(f)
             self.incoming[i] = m
@@ -57,6 +60,7 @@ class Node(object):
         """
         Sends all outgoing messages.
         """
+
         n, q = self.outgoing.shape
         print(self.outgoing)
         print(len(self.nbrs))
@@ -66,8 +70,9 @@ class Node(object):
 
     def check_convergence(self):
         """
-        Check if any messages have changed.
+        Checks if any messages have changed.
         """
+
         n, q = self.outgoing.shape
         if self.enabled:
             for i in range(n):
@@ -105,6 +110,10 @@ class PropagationNode(Node):
         self.observed = -1
 
     def add_nbrs(self, graph):
+        """
+        Adds all the neighbors of a node given the information of the graph.
+        """
+
         pattern = re.compile(r"[0-9]+")
         index = int(re.findall(pattern, self.name)[0]) - 1
         n, _ = graph.adjacency.shape
@@ -117,6 +126,7 @@ class PropagationNode(Node):
         """
         Condition on observing certain value.
         """
+
         self.enable()
         self.observed = observation
         # set messages (won't change)

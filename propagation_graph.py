@@ -19,6 +19,10 @@ class Graph(object):
         self.p = p
 
     def add_propagation_node(self, n, name, dim):
+        """
+        Returns a new propagation node to the graph.
+        """
+
         newId = len(self.var)
         new_node = PropagationNode(name, n, dim, newId)
         self.var[name] = new_node
@@ -30,9 +34,10 @@ class Graph(object):
         """
         Constructs the graph from the given adjacency matrix.
         """
+
         n, _ = self.adjacency.shape
         for i in range(n):
-            n_nbrs = int(np.linalg.norm(self.adjacency[i], ord=1) - 1)
+            n_nbrs = int(np.linalg.norm(self.adjacency[i], ord=1) - 1)  # we assume diagonals being 1
             name = "Node #{}".format(i + 1)
             self.add_propagation_node(n_nbrs, name, self.n_clusters)
 
@@ -41,15 +46,17 @@ class Graph(object):
 
     def disable_all(self):
         """
-        Disable all nodes in graph.
+        Disables all nodes in graph.
         """
+
         for k, v in iteritems(self.var):
             v.disable()
 
     def reset(self):
         """
-        Reset messages to original state.
+        Resets messages to original state.
         """
+
         for k, v in iteritems(self.var):
             v.reset()
         self.converged = False
@@ -63,6 +70,7 @@ class Graph(object):
         - then push outgoing to neighbors' incoming
         - check outgoing with previous outgoing to check for convergence
         """
+
         # loop to convergence
         timestep = 0
         while timestep < maxsteps and not self.converged:  # run for maxsteps cycles
@@ -95,6 +103,7 @@ class Graph(object):
         Returns dictionary of all marginal distributions
         indexed by corresponding variable name.
         """
+
         n, _ = self.adjacency.shape
         # message pass
         self.belief_propagation(maxsteps)
