@@ -18,12 +18,12 @@ from extremal_optimization import EONode, EOGraph
 # for extremal optimization
 n = 500
 q = 2
-a = 3
-b = 10
+a = 10
+b = 2
 tau = 1.4
 A, ground_truth, p_in, p_out = bp.select_model("sparse-sbm", n, a, b)
-p = bp.edge_prob_mat(p_in, p_out)
-g = EOGraph(A, 2, p)
-g.construct_from_adj()
-result = g.extremal_optimization(tau)
-print(result)
+g = EOGraph(A, 2)
+g.construct_from_adj(hamiltonian=True)
+result = g.extremal_optimization(tau, hamiltonian=True)
+print(result[: int(n / 2)])
+print(result[int(n / 2) :])
