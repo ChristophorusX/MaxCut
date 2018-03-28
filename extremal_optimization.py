@@ -1,6 +1,6 @@
-import numpy as np
 import re
 import heapq
+import numpy as np
 from random import randint
 import scipy.stats as stats
 import propagation_node as ppn
@@ -211,12 +211,13 @@ class EOGraph(ppg.Graph):
         The Extremal Optimization algorithm.
         """
 
+        print("Starting extremal optimization...")
         self.initialize_grouping()
         self.sorting_by_fitness()
         n, _ = self.adjacency.shape
         t_max = 20 * n  # TODO: customize const 1 << A << n
         for i in range(t_max):
-            print("ROUND {}".format(i))
+            # print("ROUND {}".format(i))
             node1, node2 = self.random_swapping(tau)
             node1.update_fitness(hamiltonian)
             node2.update_fitness(hamiltonian)
