@@ -146,13 +146,14 @@ class EOGraph(ppg.Graph):
         grouping2 = 0
         for key, node in self.var.items():
             if grouping1 < int(n / 2) and grouping2 < int(n / 2):
-                node.grouping = randint(1, 2)
+                node.grouping = randint(0, 1)
+                node.grouping = node.grouping * 2 - 1
                 if node.grouping == 1:
                     grouping1 += 1
                 else:
                     grouping2 += 1
             elif grouping1 >= int(n / 2):
-                node.grouping = 2
+                node.grouping = -1
                 grouping2 += 1
             else:
                 node.grouping = 1
@@ -233,4 +234,4 @@ class EOGraph(ppg.Graph):
                     node.update_fitness(hamiltonian)
             self.sorting_by_fitness()
         result = [node.grouping for key, node in self.var.items()]
-        return result
+        return np.array(result)
