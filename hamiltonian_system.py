@@ -15,4 +15,6 @@ def build_system_from_graph(adjacency, type):
         interaction_strength = adjacency * random
         return interaction_strength
     if type == 'glasses':
-        pass
+        random = np.random.randint(2, size=(n, n)) * 2 - 1
+        interaction_strength = adjacency * random
+        return interaction_strength
