@@ -48,7 +48,8 @@ class EONode(ppn.Node):
             nbr_arr = graph.adjacency[index]
             for i in range(n):
                 if i != index and nbr_arr[i] != 0:
-                    self.nbrs.append((graph.var["Node #{}".format(i + 1)], nbr_arr[i]))
+                    self.nbrs.append(
+                        (graph.var["Node #{}".format(i + 1)], nbr_arr[i]))
         else:
             pattern = re.compile(r"[0-9]+")
             index = int(re.findall(pattern, self.name)[0]) - 1
@@ -99,7 +100,8 @@ class EOGraph(ppg.Graph):
     """
 
     def __init__(self, adjacency, n_clusters):
-        super(EOGraph, self).__init__(adjacency, n_clusters, 0.5) # here 0.5 is a dummy
+        super(EOGraph, self).__init__(
+            adjacency, n_clusters, 0.5)  # here 0.5 is a dummy
         self.heap = None
 
     def add_eo_node(self, n, name, dim):
@@ -119,7 +121,8 @@ class EOGraph(ppg.Graph):
             n, _ = self.adjacency.shape
             for i in range(n):
                 # we assume diagonals being 1
-                n_nbrs = int(np.linalg.norm(self.adjacency[i].ravel(), ord=0) - 1)
+                n_nbrs = int(np.linalg.norm(
+                    self.adjacency[i].ravel(), ord=0) - 1)
                 name = "Node #{}".format(i + 1)
                 self.add_eo_node(n_nbrs, name, self.n_clusters)
 

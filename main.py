@@ -13,6 +13,7 @@ def error_rate(result, ground_truth):
     err2 = np.linalg.norm(result + ground_truth, ord=0) / n
     return min(err1, err2)
 
+
 # # for belief propagation
 # n = 50
 # q = 2
@@ -24,6 +25,7 @@ def error_rate(result, ground_truth):
 # g.construct_from_adj()
 # marginals = g.marginals(maxsteps=100)
 # print("MARGINALS:\n{}".format(marginals))
+
 
 # # for extremal optimization on SBM
 # n = 500
@@ -47,7 +49,8 @@ def error_rate(result, ground_truth):
 n = 500
 tau = 1.4
 A = reg.regular_graph(n, 3)
-J = hs.build_system_from_graph(A, 'gaussian') # A becomes interaction_strength J
+# A becomes interaction_strength J
+J = hs.build_system_from_graph(A, 'gaussian')
 g = EOGraph(J, 2)
 g.construct_from_adj(hamiltonian=True)
 result = g.extremal_optimization(tau, hamiltonian=True)
