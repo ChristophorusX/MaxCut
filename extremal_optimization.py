@@ -119,7 +119,7 @@ class EOGraph(ppg.Graph):
             n, _ = self.adjacency.shape
             for i in range(n):
                 # we assume diagonals being 1
-                n_nbrs = int(np.linalg.norm(self.adjacency[i], ord=0) - 1)
+                n_nbrs = int(np.linalg.norm(self.adjacency[i].ravel(), ord=0) - 1)
                 name = "Node #{}".format(i + 1)
                 self.add_eo_node(n_nbrs, name, self.n_clusters)
 
@@ -216,7 +216,7 @@ class EOGraph(ppg.Graph):
         self.initialize_grouping()
         self.sorting_by_fitness()
         n, _ = self.adjacency.shape
-        t_max = 20 * n  # TODO: customize const 1 << A << n
+        t_max = 2000 * n  # TODO: customize const 1 << A << n
         for i in range(t_max):
             # print("ROUND {}".format(i))
             node1, node2 = self.random_swapping(tau)

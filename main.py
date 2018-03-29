@@ -1,5 +1,6 @@
 import numpy as np
 import belief_propagation as bp
+import regular_graph as reg
 import propagation_graph as graph
 import hamiltonian_system as hs
 from extremal_optimization import EONode, EOGraph
@@ -24,19 +25,31 @@ def error_rate(result, ground_truth):
 # marginals = g.marginals(maxsteps=100)
 # print("MARGINALS:\n{}".format(marginals))
 
-# for extremal optimization
+# # for extremal optimization on SBM
+# n = 500
+# q = 2
+# a = 10
+# b = 2
+# tau = 1.4
+# A, ground_truth, p_in, p_out = bp.select_model("sparse-sbm", n, a, b)
+# g = EOGraph(A, 2)
+# g.construct_from_adj(hamiltonian=True)
+# result = g.extremal_optimization(tau, hamiltonian=True)
+# # print(result[: int(n / 2)])
+# # print(result[int(n / 2) :])
+# err_rate = error_rate(result, ground_truth)
+# print("The error rate is: {}".format(err_rate))
+# density = hs.state_energy_density(result, A)
+# print("The state energy density is: {}".format(density))
+
+
+# for extremal optimization on regular graph hamiltonian
 n = 500
-q = 2
-a = 10
-b = 2
 tau = 1.4
-A, ground_truth, p_in, p_out = bp.select_model("sparse-sbm", n, a, b)
-g = EOGraph(A, 2)
+A = reg.regular_graph(n, 3)
+J = hs.build_system_from_graph(A, 'gaussian') # A becomes interaction_strength J
+g = EOGraph(J, 2)
 g.construct_from_adj(hamiltonian=True)
 result = g.extremal_optimization(tau, hamiltonian=True)
-# print(result[: int(n / 2)])
-# print(result[int(n / 2) :])
-err_rate = error_rate(result, ground_truth)
-print("The error rate is: {}".format(err_rate))
-density = hs.state_energy_density(result, A)
+density = hs.state_energy_density(result, J)
 print("The state energy density is: {}".format(density))
