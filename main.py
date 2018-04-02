@@ -50,9 +50,15 @@ n = 500
 tau = 1.4
 A = reg.regular_graph(n, 3)
 # A becomes interaction_strength J
-J = hs.build_system_from_graph(A, 'gaussian')
+J = hs.build_system_from_graph(A, 'glasses')
 g = EOGraph(J, 2)
 g.construct_from_adj(hamiltonian=True)
 result = g.extremal_optimization(tau, hamiltonian=True)
+density = hs.state_energy_density(result, J)
+print("The state energy density is: {}".format(density))
+
+g_old = EOGraph(J, 2)
+g_old.construct_from_adj(hamiltonian=True)
+result = g_old.extremal_optimization(tau, hamiltonian=True, version='old')
 density = hs.state_energy_density(result, J)
 print("The state energy density is: {}".format(density))
