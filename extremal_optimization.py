@@ -260,7 +260,7 @@ class EOGraph(ppg.Graph):
             t_max = 2000 * n  # TODO: customize const 1 << A << n
             for i in range(t_max):
                 # print("ROUND {}".format(i))
-                node1, node2 = self.worst_swapping(tau)
+                node1, node2 = self.worst_swapping()
                 node1.update_fitness(hamiltonian)
                 node2.update_fitness(hamiltonian)
                 if hamiltonian:
