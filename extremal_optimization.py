@@ -180,6 +180,19 @@ class EOGraph(ppg.Graph):
         self.heap = [node for key, node in self.var.items()]
         heapq.heapify(self.heap)  # min heap
 
+    def worst_swapping(self):
+        n, _ = self.adjacency.shape
+        node1 = self.heap[0]
+        grouping1 = node1.grouping
+        k2 = np.random.randint(n)
+        while self.heap[k2].grouping == grouping1:
+            k2 = np.random.randint(n)
+        node2 = self.heap[k2]
+        tmp = node1.grouping
+        node1.grouping = node2.grouping
+        node2.grouping = tmp
+        return node1, node2
+
     def random_swapping(self, tau):
         """
         Randomly swaps two vertices in different groups with a power law chance.
@@ -210,31 +223,58 @@ class EOGraph(ppg.Graph):
         pmf /= pmf.sum()
         return stats.rv_discrete(values=(range(1, m + 1), pmf))
 
-    def extremal_optimization(self, tau, hamiltonian=False):
+    def extremal_optimization(self, tau, hamiltonian=False, version='tau'):
         """
         The Extremal Optimization algorithm.
         """
 
-        print("Starting extremal optimization...")
-        self.initialize_grouping()
-        self.sorting_by_fitness()
-        n, _ = self.adjacency.shape
-        t_max = 2000 * n  # TODO: customize const 1 << A << n
-        for i in range(t_max):
-            # print("ROUND {}".format(i))
-            node1, node2 = self.random_swapping(tau)
-            node1.update_fitness(hamiltonian)
-            node2.update_fitness(hamiltonian)
-            if hamiltonian:
-                for node, strength in node1.nbrs:
-                    node.update_fitness(hamiltonian)
-                for node, strength in node2.nbrs:
-                    node.update_fitness(hamiltonian)
-            else:
-                for node in node1.nbrs:
-                    node.update_fitness(hamiltonian)
-                for node in node2.nbrs:
-                    node.update_fitness(hamiltonian)
+        if version == 'tau':
+            print("Starting extremal optimization...")
+            self.initialize_grouping()
             self.sorting_by_fitness()
-        result = [node.grouping for key, node in self.var.items()]
-        return np.array(result)
+            n, _ = self.adjacency.shape
+            t_max = 2000 * n  # TODO: customize const 1 << A << n
+            for i in range(t_max):
+                # print("ROUND {}".format(i))
+                node1, node2 = self.random_swapping(tau)
+                node1.update_fitness(hamiltonian)
+                node2.update_fitness(hamiltonian)
+                if hamiltonian:
+                    for node, strength in node1.nbrs:
+                        node.update_fitness(hamiltonian)
+                    for node, strength in node2.nbrs:
+                        node.update_fitness(hamiltonian)
+                else:
+                    for node in node1.nbrs:
+                        node.update_fitness(hamiltonian)
+                    for node in node2.nbrs:
+                        node.update_fitness(hamiltonian)
+                self.sorting_by_fitness()
+            result = [node.grouping for key, node in self.var.items()]
+            return np.array(result)
+        elif version == 'old':
+            print("Starting extremal optimization...")
+            self.initialize_grouping()
+            self.sorting_by_fitness()
+            n, _ = self.adjacency.shape
+            t_max = 2000 * n  # TODO: customize const 1 << A << n
+            for i in range(t_max):
+                # print("ROUND {}".format(i))
+                node1, node2 = self.worst_swapping(tau)
+                node1.update_fitness(hamiltonian)
+                node2.update_fitness(hamiltonian)
+                if hamiltonian:
+                    for node, strength in node1.nbrs:
+                        node.update_fitness(hamiltonian)
+                    for node, strength in node2.nbrs:
+                        node.update_fitness(hamiltonian)
+                else:
+                    for node in node1.nbrs:
+                        node.update_fitness(hamiltonian)
+                    for node in node2.nbrs:
+                        node.update_fitness(hamiltonian)
+                self.sorting_by_fitness()
+            result = [node.grouping for key, node in self.var.items()]
+            return np.array(result)
+        else:
+            print("No such version of EO.")
